@@ -31,7 +31,7 @@ let tasksCollection;
 
 async function startServer() {
   await client.connect();
-  const db = client.db();
+  const db = client.db("shiftxDB");
   usersCollection = db.collection('users');
   tasksCollection = db.collection('tasks');
 
@@ -120,20 +120,31 @@ app.get('/tasks', verifyToken, async (req, res) => {
 
 app.post('/tasks', verifyToken, async (req, res) => {
   try {
-    const { title, description, completed } = req.body;
+    const {
+  title,
+  description,
+  completed,
+  priority,
+  dueDate,
+} = req.body;
 
     if (!title) {
       return res.status(400).json({ error: 'Task title is required' });
     }
 
-    const task = {
-      userId: req.user.userId,
-      title,
-      description: description || '',
-      completed: completed === true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+   const task = {
+  userId: req.user.userId,
+  title,
+  description: description || "",
+  completed: completed === true,
+
+  priority: priority || "medium",
+
+  dueDate: dueDate || null,
+
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
     const result = await tasksCollection.insertOne(task);
     return res.status(201).json({ ...task, _id: result.insertedId });
@@ -147,7 +158,13 @@ app.patch('/tasks/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const updates = {};
-    const { title, description, completed } = req.body;
+  const {
+  title,
+  description,
+  completed,
+  priority,
+  dueDate,
+} = req.body;
 
     if (title !== undefined) updates.title = title;
     if (description !== undefined) updates.description = description;
