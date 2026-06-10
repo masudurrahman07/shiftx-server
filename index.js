@@ -109,12 +109,87 @@ app.post("/register", async (req, res) => {
       name: name || "",
     });
 
+    const userId = result.insertedId.toString();
+
+    // Starter tasks for demo / pagination
+    const starterTasks = [
+      {
+        userId,
+        title: "Complete React Assignment",
+        description:
+          "Finish the internship React dashboard UI before Friday.",
+        completed: false,
+        priority: "high",
+        dueDate: "2026-09-10",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        userId,
+        title: "Prepare MongoDB Notes",
+        description:
+          "Revise CRUD operations and aggregation pipeline.",
+        completed: false,
+        priority: "medium",
+        dueDate: "2026-09-12",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        userId,
+        title: "Practice DSA",
+        description:
+          "Solve at least 5 LeetCode problems today.",
+        completed: false,
+        priority: "medium",
+        dueDate: "2026-09-15",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        userId,
+        title: "Update Resume",
+        description:
+          "Add latest MERN projects and internship work.",
+        completed: false,
+        priority: "low",
+        dueDate: "2026-09-18",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        userId,
+        title: "Deploy Task Manager",
+        description:
+          "Deploy frontend and backend before project submission.",
+        completed: false,
+        priority: "high",
+        dueDate: "2026-09-20",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        userId,
+        title: "Change Name",
+        description:
+          "I have to change my name within 3 days in PUBG and Counter Strike",
+        completed: false,
+        priority: "high",
+        dueDate: "2026-09-06",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+
+    await tasksCollection.insertMany(starterTasks);
+
     return res.status(201).json({
-      userId: result.insertedId.toString(),
+      userId,
       email,
     });
   } catch (error) {
     console.error("Register error:", error);
+
     return res
       .status(500)
       .json({ error: "Failed to register user" });
