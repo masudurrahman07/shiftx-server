@@ -42,9 +42,7 @@ async function startServer() {
   });
 }
 
-/* =========================
-   AUTH MIDDLEWARE
-========================= */
+// Middleware to verify JWT token and attach user info to request
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -80,9 +78,7 @@ function buildTaskUserFilter(userId) {
   return { $or: filters };
 }
 
-/* =========================
-   REGISTER
-========================= */
+// Register new user and create starter tasks
 app.post("/register", async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -196,9 +192,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-/* =========================
-   LOGIN
-========================= */
+// Login user and return JWT token
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -246,9 +240,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-/* =========================
-   GET TASKS
-========================= */
+// Get tasks for authenticated user
 app.get("/tasks", verifyToken, async (req, res) => {
   try {
     const tasks = await tasksCollection
@@ -264,9 +256,7 @@ app.get("/tasks", verifyToken, async (req, res) => {
   }
 });
 
-/* =========================
-   CREATE TASK
-========================= */
+// Create new task for authenticated user
 app.post("/tasks", verifyToken, async (req, res) => {
   try {
     const {
@@ -284,7 +274,7 @@ app.post("/tasks", verifyToken, async (req, res) => {
     }
 
     const task = {
-      userId: req.user.userId.toString(), // ✅ ALWAYS STRING
+      userId: req.user.userId.toString(), 
       title,
       description: description || "",
       completed: completed === true,
@@ -308,9 +298,7 @@ app.post("/tasks", verifyToken, async (req, res) => {
   }
 });
 
-/* =========================
-   UPDATE TASK (FIXED)
-========================= */
+// Update task by id for authenticated user
 app.patch("/tasks/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -329,7 +317,7 @@ app.patch("/tasks/:id", verifyToken, async (req, res) => {
     }
     updates.updatedAt = new Date();
 
-    // ✅ Single secure filter — userId always stored as string in your schema
+   
     const result = await tasksCollection.findOneAndUpdate(
       {
         _id: new ObjectId(id),
@@ -339,7 +327,6 @@ app.patch("/tasks/:id", verifyToken, async (req, res) => {
       { returnDocument: "after" }
     );
 
-    // ✅ Driver v4+: result IS the document, not result.value
     if (!result) {
       return res.status(404).json({ error: "Task not found" });
     }
@@ -351,9 +338,7 @@ app.patch("/tasks/:id", verifyToken, async (req, res) => {
   }
 });
 
-/* =========================
-   DELETE TASK (FIXED)
-========================= */
+// Delete task by id for authenticated user
 app.delete("/tasks/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -384,16 +369,12 @@ app.delete("/tasks/:id", verifyToken, async (req, res) => {
   }
 });
 
-/* =========================
-   HEALTH CHECK
-========================= */
+// Health check endpoint
 app.get("/", (req, res) => {
   res.send("ShiftX backend is running");
 });
 
-/* =========================
-   START SERVER
-========================= */
+// Start the server
 startServer().catch((error) => {
   console.error("Failed to start server:", error);
   process.exit(1);
